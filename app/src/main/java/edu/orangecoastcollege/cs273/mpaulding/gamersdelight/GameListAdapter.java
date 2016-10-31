@@ -24,14 +24,15 @@ import java.util.List;
  */
 public class GameListAdapter extends ArrayAdapter<Game> {
 
-    private Context mContext;
-    private List<Game> mGamesList = new ArrayList<>();
-    private int mResourceId;
-    private ImageView gameListImageView;
-    private TextView gameListNameView;
-    private TextView gameDescriptionView;
-    private RatingBar bar;
-    private LinearLayout layout;
+    private Context context;
+    private List<Game> gamesList = new ArrayList<>();
+    private int resourceId;
+
+    private ImageView listItemImageView;
+    private TextView listItemNameTextView;
+    private TextView listItemDescriptionTextView;
+    private RatingBar listItemRatingBar;
+    private LinearLayout gameListLinearLayout;
     // private TextView gameListNameView;
 
     /**
@@ -43,9 +44,9 @@ public class GameListAdapter extends ArrayAdapter<Game> {
      */
     public GameListAdapter(Context c, int rId, List<Game> games) {
         super(c, rId, games);
-        mContext = c;
-        mResourceId = rId;
-        mGamesList = games;
+        context = c;
+        resourceId = rId;
+        gamesList = games;
     }
 
     /**
@@ -58,37 +59,39 @@ public class GameListAdapter extends ArrayAdapter<Game> {
     @Override
     public View getView(int pos, View convertView, ViewGroup parent)
     {
-        Game newGame = mGamesList.get(0);
-        LayoutInflater inflater =
-                (LayoutInflater) mContext.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
-        View view = inflater.inflate(mResourceId, null);
+        LayoutInflater inflater =
+                (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+
+        View view = inflater.inflate(resourceId, null);
 
         //TODO:  Code for getting the view of a list item correctly inflated.
-        gameListImageView =(ImageView) view.findViewById(R.id.gameListImageView);
-        gameListNameView =(TextView) view.findViewById(R.id.gameDetailsNameTextView);
-        gameDescriptionView =(TextView) view.findViewById(R.id.gameDetailsDescriptionTextView);
-        layout = (LinearLayout) view.findViewById(R.id.gameListLinearLayout);
+        Game game = gamesList.get(pos);
 
-        bar = (RatingBar) view.findViewById(R.id.gameRatingBar);
-layout.setTag(newGame);
+        listItemImageView = (ImageView) view.findViewById(R.id.gameListImageView);
+        listItemNameTextView = (TextView) view.findViewById(R.id.gameListNameTextView);
+        listItemDescriptionTextView = (TextView) view.findViewById(R.id.gameListDescriptionTextView);
+        listItemRatingBar = (RatingBar) view.findViewById(R.id.gameListRatingBar);
+        gameListLinearLayout = (LinearLayout) view.findViewById(R.id.gameListLinearLayout);
 
-        AssetManager am = getContext().getAssets();
+        AssetManager am = context.getAssets();
+
         try {
-            InputStream stream = am.open(newGame.getImageName());
-            Drawable picture = Drawable.createFromStream(stream, newGame.getName());
-           gameListImageView.setImageDrawable(picture);
+            InputStream stream = am.open(game.getImageName());
+            Drawable picture = Drawable.createFromStream(stream, game.getName());
+           listItemImageView.setImageDrawable(picture);
         }
         catch (IOException ex)
         {
-            Log.e("GameListAdapter.class ","R=error loading: " + newGame.getImageName(), ex);
+            Log.e("GameListAdapter.class ","error loading: " + game.getImageName(), ex);
         }
+        //set the
+       listItemNameTextView.setText(game.getName());
+        listItemDescriptionTextView.setText(game.getDescription());
+        listItemRatingBar.setRating(game.getRating());
+        //        bar.setIsIndicator(true);
 
-gameListNameView.setText(newGame.getName());
-        gameDescriptionView.setText(newGame.getDescription());
-        float rating = newGame.getRating();
-        bar.setRating(rating);
-
+        gameListLinearLayout.setTag(game);
         return view;
     }
 }

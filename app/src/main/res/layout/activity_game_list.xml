@@ -28,7 +28,8 @@
             android:ems="10"
             android:textSize="24sp"
             android:gravity="center_horizontal|center_vertical"
-            android:hint="@string/name" >
+            android:hint="@string/name"
+            android:imeOptions="actionDone">
             <requestFocus/>
         </EditText>
 
@@ -39,7 +40,8 @@
             android:hint="@string/description"
             android:ems="10"
             android:gravity="center_horizontal|center_vertical"
-            android:id="@+id/descriptionEditText" />
+            android:id="@+id/descriptionEditText"
+            android:imeOptions="actionDone"/>
 
         <RatingBar
             android:layout_width="wrap_content"
@@ -51,14 +53,14 @@
             android:isIndicator="false" />
 
         <Button
-            android:id="@+id/addTaskButton"
+            android:id="@+id/addGame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/add"
             android:onClick="addGame" />
 
         <Button
-            android:id="@+id/clearAllTasksButton"
+            android:id="@+id/clearAllGames"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/delete"
@@ -74,7 +76,8 @@
         android:background="@color/dark_aqua"
         android:paddingBottom="4dp"
         android:paddingRight="30dp"
-        android:paddingTop="10dp" >
+        android:paddingTop="10dp"
+        >
 
     </ListView>
 

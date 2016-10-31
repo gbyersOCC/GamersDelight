@@ -30,29 +30,38 @@ class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate (SQLiteDatabase database){
-   String table = "CREATE TABLE " + DATABASE_NAME+" ( "+KEY_FIELD_ID+ " INTEGER AUTOINCREMENT "+
-           FIELD_NAME + " TEXT " + FIELD_DESCRIPTION + " TEXT " + FIELD_RATING+ " REAL "+ FIELD_IMAGE_NAME+" Text )";
-        database.execSQL(table);
         // TODO:  Define the SQL statement to create a new table with the fields above.
         // TODO:  Primary key should auto increment
+   String table = "CREATE TABLE " + DATABASE_TABLE+"("
+           +KEY_FIELD_ID+ " INTEGER PRIMARY KEY AUTOINCREMENT, "
+           + FIELD_NAME + " TEXT, " +
+           FIELD_DESCRIPTION + " TEXT, " +
+           FIELD_RATING+ " REAL, "+
+           FIELD_IMAGE_NAME+" TEXT"+ ")";
+
         // TODO:  Exceute the SQL statement
+        database.execSQL(table);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase database,
                           int oldVersion,
                           int newVersion) {
+        // TODO:  Execute the SQL statment to drop the table
         database.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
+        // TODO:  Recreate the database
         onCreate(database);
 
-        // TODO:  Execute the SQL statment to drop the table
-        // TODO:  Recreate the database
+
+
     }
 
     //********** DATABASE OPERATIONS:  ADD, GETALL, EDIT, DELETE
 
     public void addGame(Game game) {
- SQLiteDatabase db = this.getWritableDatabase();
+        // TODO:  Write the code to add a new game to the database
+
+        SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
@@ -62,43 +71,9 @@ class DBHelper extends SQLiteOpenHelper {
         values.put(FIELD_IMAGE_NAME, game.getImageName());
 
         db.insert(DATABASE_TABLE,null, values);
-        // TODO:  Write the code to add a new game to the database
+
         db.close();
     }
-
-    public ArrayList<Game> getAllGames() {
-        ArrayList<Game> gameList = new ArrayList<>();
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor results= db.query(DATABASE_TABLE, null, null, null, null, null, null);
-
-               //use if else for values   moveToFirst       MoveTo NEXT
-        if(results.moveToFirst())
-        {do{
-            //use Cursor to move thru the column headers
-            int id = results.getInt(0);
-            String name = results.getString(1);
-            String desc = results.getString(2);
-            float rating = results.getFloat(3);
-            String imageName = results.getString(4);
-
-            Game newGame = new Game(id, name, desc, rating, imageName);
-        }while(results.moveToNext());
-        }
-db.close();
-        // TODO:  Write the code to get all games from the database and return in ArrayList
-//return arrayList
-        return gameList;
-    }
-
-    public void deleteAllGames()
-    {
-        SQLiteDatabase db = this.getWritableDatabase();
-db.delete(DATABASE_NAME, null, null);
-        db.close();
-        // TODO:  Write the code to delete all games from the database
-    }
-
     public void updateGame(Game game){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -107,26 +82,77 @@ db.delete(DATABASE_NAME, null, null);
         values.put(FIELD_DESCRIPTION, game.getDescription());
         values.put(FIELD_RATING, game.getRating());
         values.put(FIELD_IMAGE_NAME, game.getImageName());
-//update uses table name values then search for keyField Id, new String array static valuesOf method (games.getId)
-db.update(DATABASE_TABLE,values,KEY_FIELD_ID+"=?",new String[] {String.valueOf(game.getId())});
+
+        //update uses table name values then search for keyField Id, new String array static valuesOf method (games.getId)
+        db.update(DATABASE_TABLE,values,
+                KEY_FIELD_ID+" = ? ",
+                new String[] {String.valueOf(game.getId())});
 
         // TODO:  Write the code to update a game in the database.
+        db.close();
+    }
+    public ArrayList<Game> getAllGames() {
+
+        // TODO:  Write the code to get all games from the database and return in ArrayList
+
+        ArrayList<Game> gameList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor results= db.query(DATABASE_TABLE,
+                new String[]{KEY_FIELD_ID, FIELD_NAME,
+                        FIELD_DESCRIPTION,
+                        FIELD_RATING,
+                        FIELD_IMAGE_NAME},
+                null, null, null, null, null, null);
+
+        //use if for values   moveToFirst       MoveTo NEXT
+        if(results.moveToFirst())
+        {
+            do{
+
+            //use Cursor to move thru the column headers
+                int id = results.getInt(0);
+                String name = results.getString(1);
+                String desc = results.getString(2);
+                float rating = results.getFloat(3);
+                String imageName = results.getString(4);
+
+                Game newGame = new Game(id, name, desc, rating, imageName);
+                gameList.add(newGame);
+
+            }while(results.moveToNext());
+        }
+
+        db.close();
+        // TODO:  Write the code to get all games from the database and return in ArrayList
+//return arrayList
+        return gameList;
     }
 
     public Game getGame(int id) {
     SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(DATABASE_TABLE, new String[]{KEY_FIELD_ID,FIELD_NAME,FIELD_RATING,FIELD_IMAGE_NAME}, KEY_FIELD_ID+"=?", new String[]{String.valueOf(id)}, null, null, null, null);
 
-        if(cursor!= null)
-        {
-            cursor.moveToFirst();
-        }
-        Game cursGame = new Game(cursor.getInt(0),cursor.getString(1),cursor.getString(2), cursor.getFloat(3), cursor.getString(4));
+//
+        Game cursFoundGame = new Game(cursor.getInt(0),cursor.getString(1),cursor.getString(2), cursor.getFloat(3), cursor.getString(4));
         db.close();
-        return cursGame;
+        return cursFoundGame;
 
         // TODO:  Write the code to get a specific game from the database
         // TODO:  Replace the return null statement below with the game from the database.
+
+    }
+    public void deleteAllGames()
+    {
+        // TODO:  Write the code to delete all games from the database
+
+        //reference a writable database
+        SQLiteDatabase db = this.getWritableDatabase();
+        //use SQLiteDatabase method delete(String name, null,null, null)
+        db.delete(DATABASE_TABLE, null, null);
+        //close database
+        db.close();
 
     }
 

@@ -1,5 +1,6 @@
 package edu.orangecoastcollege.cs273.mpaulding.gamersdelight;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,8 +21,10 @@ public class GameListActivity extends AppCompatActivity {
     private ListView gamesListView;
     private EditText nameEditText;
     private EditText descText;
-    private LinearLayout layout;
     private RatingBar bar;
+
+
+
 
 
     @Override
@@ -38,80 +41,76 @@ public class GameListActivity extends AppCompatActivity {
         db.addGame(new Game("Doom FLH", "First person shooter", 2.5f, "doomflh.png"));
         db.addGame(new Game("Battlefield 1", "Single player campaign", 5.0f, "battlefield1.png"));
 
-        gamesList = db.getAllGames();
         // TODO:  Populate all games from the database into the list
-        gamesListAdapter = new GameListAdapter(this,R.layout.game_list_item, gamesList);
+        gamesList = db.getAllGames();
+
         // TODO:  Create a new ListAdapter connected to the correct layout file and list
-        gamesListView = (ListView)findViewById(R.id.gameListView);
-        gamesListView.setAdapter(gamesListAdapter);
+        gamesListAdapter = new GameListAdapter(this, R.layout.game_list_item, gamesList);
         // TODO:  Connect the ListView with the ListAdapter
+        gamesListView = (ListView) findViewById(R.id.gameListView);
+
+
+        gamesListView.setAdapter(gamesListAdapter);
     }
 
     public void viewGameDetails(View view) {
-        layout = (LinearLayout) findViewById(R.id.gameListLinearLayout) ;
-        Game recievedGame = (Game) layout.getTag();
-        Intent detailIntent = new Intent(this, GameDetailsActivity.class);
-
-        detailIntent.putExtra("NAME", recievedGame.getName());
-        detailIntent.putExtra("DESC", recievedGame.getDescription());
-        //needs rating
-        detailIntent.putExtra("IMAGE", recievedGame.getImageName());
-
-        startActivity(detailIntent);
-
-
 
         // TODO: Use an Intent to start the GameDetailsActivity with the data it needs to correctly inflate its views.
+
+
+//            LinearLayout selectedLinearLayout = (LinearLayout) view;
+//            Game selectedGame = (Game) selectedLinearLayout.getTag();
+
+        LinearLayout selectedLinearLayout = (LinearLayout) view;
+
+
+            Game selectedGame = (Game) selectedLinearLayout.getTag();
+
+            Intent detailsIntent = new Intent(this, GameDetailsActivity.class);
+
+            detailsIntent.putExtra("NAME", selectedGame.getName());
+            detailsIntent.putExtra("DESC",selectedGame.getDescription());
+            detailsIntent.putExtra("IMAGE", selectedGame.getImageName());
+            detailsIntent.putExtra("RATING", selectedGame.getRating());
+            startActivity(detailsIntent);
+
     }
 
     public void addGame(View view)
     {
-
-        nameEditText = (EditText) findViewById(R.id.nameEditText);
-        descText = (EditText) findViewById(R.id.descriptionEditText);
-        bar = (RatingBar) findViewById(R.id.gameListRatingBar) ;
-
-       float barValue = bar.getRating();
-
-        String gameName = nameEditText.getText().toString();
-
-       String description = descText.getText().toString();
-
-
-        if(description.isEmpty()||gameName.isEmpty())
-        {
-            Toast.makeText(this, "Description invalid! Does not have text", Toast.LENGTH_SHORT).show();
-        }else
-        {
-            Game newGame = new Game(gameName,description,barValue);
-            db.addGame(newGame);
-            gamesListAdapter.add(newGame);
-        }
-        bar.setRating(0);
-        nameEditText.setText("");
-        descText.setText("");
-
-//            Task newTask = new Task(description, 0);
-//
-//            //add task to ListAdapter
-//            taskListAdapter.add(newTask);
-//
-//            //add to DataBase
-//            database.addTask(newTask);
-//
-//            taskEditTask.setText("");
-
         // TODO:  Add a game to the database, list, list adapter
-        // TODO:  Make sure the list adapter is updated
+        descText = (EditText) findViewById(R.id.descriptionEditText);
+        nameEditText = (EditText) findViewById(R.id.nameEditText);
+        bar = (RatingBar) findViewById(R.id.gameRatingBar) ;
 
-        // TODO:  Clear all entries the user made (edit text and rating bar)
+
+        String name = nameEditText.getText().toString();
+        String description = descText.getText().toString();
+        float rating = bar.getRating();
+
+        if(name.isEmpty() || description.isEmpty() ){
+            Toast.makeText(this, "Task name or description can't be empty.", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            //create a nw object with button-made parameters
+            Game newGame = new Game(name, description, rating);
+            //add obj to database
+            db.addGame(newGame);
+
+            //add obj to CustomListAdapter
+            gamesListAdapter.add(newGame);
+            nameEditText.setText("");
+            descText.setText("");
+            bar.setRating(0);
+        }
     }
 
     public void clearAllGames(View view)
     {
+        // TODO:  Delete all games from the database and lists
         gamesList.clear();
         db.deleteAllGames();
-        // TODO:  Delete all games from the database and lists
+        gamesListAdapter.notifyDataSetChanged();
     }
 
 }
